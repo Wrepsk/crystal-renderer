@@ -2,7 +2,10 @@
   <PropertyGroup>
     <Version>0.1.0</Version>
     <Authors>Wrepsk; sourpuh and Pictomancy contributors</Authors>
-    <Description>Screen rendering and FFXIV graphics integration for CrystalCast.</Description>
+    <Description>Screen rendering and FFXIV graphics integration for Dalamud plugins.</Description>
+    <PackageProjectUrl>https://github.com/Wrepsk/crystal-renderer</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Wrepsk/crystal-renderer.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
     <AssemblyName>CrystalRenderer</AssemblyName>
     <RootNamespace>CrystalRenderer</RootNamespace>
     <Platforms>x64</Platforms>
