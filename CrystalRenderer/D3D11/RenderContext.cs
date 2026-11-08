@@ -99,6 +99,17 @@ internal class RenderContext : IDisposable
         Context.ClearState();
     }
 
+    /// <summary>
+    /// Direct3D 11 destroys released objects lazily. Views and command lists that used the
+    /// back buffer still count as references until the device processes that queue, which
+    /// makes the game's IDXGISwapChain::ResizeBuffers fail. Must run on the thread that is
+    /// using the immediate context (the swap chain resize call).
+    /// </summary>
+    public void FlushImmediateContext()
+    {
+        Device.ImmediateContext.Flush();
+    }
+
     public void BeginFrame()
     {
         _frameCounter++;

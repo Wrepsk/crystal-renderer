@@ -105,6 +105,23 @@ internal sealed class ScreenRenderPipeline : IDisposable
         }
     }
 
+    /// <summary>
+    /// Called just before the game resizes its swap chain: drop a scheduled composite that would
+    /// target the old back buffer, clear the recording context, and let Direct3D destroy every
+    /// released view or command list that still refers to the old buffers.
+    /// </summary>
+    internal void ReleaseBeforeSwapChainResize()
+    {
+        lock (gate)
+        {
+            if (disposed) return;
+            frames.Cancel();
+            images.Discard();
+            context.DiscardFrame();
+            context.FlushImmediateContext();
+        }
+    }
+
     internal void Discard()
     {
         lock (gate)

@@ -2,6 +2,7 @@ using CrystalRenderer.D3D11;
 using CrystalRenderer.Integration;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Game.ClientState.Conditions;
+using Dalamud.Interface;
 using Dalamud.Interface.Utility;
 using Dalamud.Plugin;
 using FFXIVClientStructs.FFXIV.Component.GUI;
@@ -15,6 +16,7 @@ public sealed class DalamudScreenRenderer : IScreenRenderBackend
 {
     private readonly object overlayGate = new();
     private readonly RendererServices services;
+    private readonly IUiBuilder uiBuilder;
     private readonly ScreenRendererOptions options;
     private readonly ScreenRenderPipeline pipeline;
     private OverlayController? overlayController;
@@ -29,9 +31,11 @@ public sealed class DalamudScreenRenderer : IScreenRenderBackend
         this.options.Validate();
         services = pluginInterface.Create<RendererServices>()
             ?? throw new InvalidOperationException("Could not resolve CrystalRenderer's Dalamud services.");
+        uiBuilder = pluginInterface.UiBuilder;
         try
         {
             pipeline = new ScreenRenderPipeline(services.Log, services.HookProvider, this.options.MaxSurfaces);
+            uiBuilder.ResizeBuffers += OnResizeBuffers;
             _ = InitializeNativeOverlayAsync(pluginInterface);
         }
         catch
@@ -161,8 +165,28 @@ public sealed class DalamudScreenRenderer : IScreenRenderBackend
         return (middle != null && middle->IsVisible) || (black != null && black->IsVisible);
     }
 
+    /// <summary>
+    /// Dalamud raises this just before the game's swap chain is resized (for example when
+    /// switching between fullscreen and windowed). Any lingering reference to the old back
+    /// buffer makes the resize fail, which the game does not survive.
+    /// </summary>
+    private void OnResizeBuffers()
+    {
+        try
+        {
+            pipeline?.ReleaseBeforeSwapChainResize();
+            HideNativeOverlay();
+            services.Log.Information("CrystalRenderer released back-buffer work before a swap chain resize.");
+        }
+        catch (Exception ex)
+        {
+            services.Log.Warning(ex, "CrystalRenderer could not release back-buffer work before a swap chain resize.");
+        }
+    }
+
     public void Dispose()
     {
+        uiBuilder.ResizeBuffers -= OnResizeBuffers;
         lock (overlayGate)
         {
             if (disposed) return;
