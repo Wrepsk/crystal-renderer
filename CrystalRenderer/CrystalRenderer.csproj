@@ -25,6 +25,6 @@
     <PackageReference Include="SharpDX.Mathematics" Version="4.2.0" />
     <PackageReference Include="SharpDX.D3DCompiler" Version="4.2.0" />
     <PackageReference Include="SharpDX.Direct3D11" Version="4.2.0" />
-    <PackageReference Include="KamiToolKit" Version="1.1.2" />
+    <PackageReference Include="KamiToolKit" Version="2.2.66" />
   </ItemGroup>
 </Project>

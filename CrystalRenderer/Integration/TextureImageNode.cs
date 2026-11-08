@@ -2,7 +2,7 @@
 // See LICENSE.Pictomancy and THIRD_PARTY_NOTICES.md.
 ﻿using FFXIVClientStructs.FFXIV.Client.Graphics.Kernel;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using KamiToolKit.Premade.Node.Simple;
+using KamiToolKit.Nodes.Simplified;
 
 namespace CrystalRenderer.Integration;
 
@@ -19,11 +19,13 @@ internal unsafe class TextureImageNode : SimpleImageNode
         asset->AtkTexture.TextureType = TextureType.KernelTexture;
     }
 
-    protected override void Dispose(bool disposing, bool isNativeDestructor)
+    protected override void Dispose(bool disposing)
     {
+        // The texture belongs to ScreenOverlayNode; only release this node's own resources
+        // on an explicit dispose, never from a finalizer.
         if (disposing)
         {
-            base.Dispose(disposing, isNativeDestructor);
+            base.Dispose(disposing);
         }
     }
 }

@@ -6,7 +6,7 @@ using Dalamud.Interface.Utility;
 using Dalamud.Plugin;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using KamiToolKit;
-using KamiToolKit.Overlay.UiOverlay;
+using KamiToolKit.UiOverlay;
 
 namespace CrystalRenderer;
 
@@ -32,9 +32,36 @@ public sealed class DalamudScreenRenderer : IScreenRenderBackend
         try
         {
             pipeline = new ScreenRenderPipeline(services.Log, services.HookProvider, this.options.MaxSurfaces);
-            KamiToolKitLibrary.Initialize(pluginInterface, "CrystalRendererOverlay");
-            kamiInitialized = true;
-            services.Framework.RunOnFrameworkThread(() =>
+            _ = InitializeNativeOverlayAsync(pluginInterface);
+        }
+        catch
+        {
+            Dispose();
+            throw;
+        }
+    }
+
+    /// <summary>
+    /// KamiToolKit starts asynchronously. Until the overlay exists, or if it cannot be created,
+    /// IsNativeOverlayAvailable stays false and frames fall back to the ImGui overlay.
+    /// </summary>
+    private async Task InitializeNativeOverlayAsync(IDalamudPluginInterface pluginInterface)
+    {
+        try
+        {
+            await KamiToolKitLibrary.InitializeAsync(pluginInterface, "CrystalRendererOverlay");
+            lock (overlayGate)
+            {
+                if (disposed)
+                {
+                    KamiToolKitLibrary.Dispose();
+                    return;
+                }
+
+                kamiInitialized = true;
+            }
+
+            await services.Framework.RunOnFrameworkThread(() =>
             {
                 lock (overlayGate)
                 {
@@ -45,10 +72,9 @@ public sealed class DalamudScreenRenderer : IScreenRenderBackend
                 }
             });
         }
-        catch
+        catch (Exception ex)
         {
-            Dispose();
-            throw;
+            services.Log.Warning(ex, "CrystalRenderer native overlay is unavailable; using the ImGui overlay instead.");
         }
     }
 

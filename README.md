@@ -25,7 +25,7 @@ dotnet build CrystalRenderer.sln -c Debug --no-restore -p:Platform=x64
 dotnet test CrystalRenderer.sln -c Debug --no-build --no-restore -p:Platform=x64
 ```
 
-CI runs the same checks in Debug and Release on Windows. The renderer has no runtime dependency on CrystalCast. The copied rendering-validation notes describe the CrystalCast host used for live investigations; its placement, browser, and fallback policies belong to that host. Existing transitive ImageSharp audit findings are recorded in [docs/DEPENDENCY_AUDIT.md](docs/DEPENDENCY_AUDIT.md).
+CI runs the same checks in Debug and Release on Windows. The renderer has no runtime dependency on CrystalCast. The copied rendering-validation notes describe the CrystalCast host used for live investigations; its placement, browser, and fallback policies belong to that host. KamiToolKit 2.x has no ImageSharp dependency; see [docs/DEPENDENCY_AUDIT.md](docs/DEPENDENCY_AUDIT.md).
 
 ## Host API
 

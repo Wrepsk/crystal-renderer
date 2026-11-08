@@ -2,7 +2,7 @@
 // See LICENSE.Pictomancy and THIRD_PARTY_NOTICES.md.
 ﻿using FFXIVClientStructs.FFXIV.Client.Graphics.Kernel;
 using KamiToolKit.Enums;
-using KamiToolKit.Overlay.UiOverlay;
+using KamiToolKit.UiOverlay;
 using SharpDX.Direct3D11;
 
 namespace CrystalRenderer.Integration;
